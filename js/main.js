@@ -2,8 +2,9 @@
 const FLOOR = 'FLOOR'
 const MINE = 'MINE'
 const MINE_IMG = '<img src="img/mine.jpg">'
-var gNegsCount = 0
+var gNegsCount = gNegsCount
 var gBoard
+var negsCount
 //gameStart
 function onInit() {
     gBoard = buildBoard()
@@ -38,7 +39,7 @@ function renderBoard(board) {
         for (var j = 0; j < board[0].length; j++) {
             var currCell = board[i][j]
             var cellClass = getClassName({ i: i, j: j }) + ''
-            strHTML += `<td class="cell ${cellClass}" onclick="onClick(${i},${j})" cell.innertext ="${gNegsCount}" >`
+            strHTML += `<td class="cell ${cellClass}" onclick="onClick(${i},${j})"<span>${''}</span>`
             if (currCell.gameElement === MINE) strHTML += MINE_IMG;
         }
         strHTML += '</td>'
@@ -60,7 +61,7 @@ function getClassName(location) {
 // onclickCell
 
 function onClick(i, j) {
-    var negsCount = countGamerNegs(i, j);
+    var negsCount = countNegs(i,j,gBoard);
     if (gBoard[i][j].gameElement === MINE) {
         gameOver();
     } else {
@@ -94,18 +95,26 @@ function getEmptyPos() {
     var randIdx = getRandomInt(0, emptyPoss.length)
     return emptyPoss[randIdx]
 }
-function countGamerNegs() {
-    var mineCount = 0;
-    for (var i = gBoard.i - 1; i <= gBoard.i +1; i++) {
-        if (i < 0 || i >= gBoard.length) continue;
-        for (var j = gBoard.j-1 ; j <= gBoard.j + 1; j++) {
-            if (j < 0 || j >= gBoard[i].length) continue;
-            var currCell = gBoard[i][j]
-            if (currCell.gameElement === MINE) mineCount++;
+function countNegs(cellI, cellJ, board) {
+     negsCount = 0
+    for (var i = cellI - 1; i <= cellI + 1; i++) {
+        if (i < 0 || i >= board.length) continue
+        for (var j = cellJ - 1; j <= cellJ + 1; j++) {
+            if (j < 0 || j >= board[i].length) continue
+            if (i === cellI && j === cellJ) continue  
+            var currCell = board[i][j]   
+            if (currCell.gameElement === MINE) negsCount++;
         }
-    }
-    return mineCount
+ }
+ return negsCount
 }
 function gameOver() {
     alert('YouLose')
 }
+
+// if (currCell.gameElement === MINE) gNegsCount++;
+// console.log(gNegsCount)
+// return gNegsCount
+
+
+
