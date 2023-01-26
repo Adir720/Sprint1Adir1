@@ -5,35 +5,49 @@ body {
     text-align: center;
 }
 
-.board {
-   
-    width: 300px;
-    height: 300px;
+.board :hover{
+   background-color: red;
+    width: auto;
+    height: auto;
 }
 
 table {
     background-color: rgb(7, 121, 220);
-    padding-left: 7%;
-    width: 600px;
-    height: 600px;
+    width: auto;
+    height:auto;
     display:inline-block;
     margin: auto;
 }
-
-.cell {
-    background-color: aliceblue;
-    padding: 25px;
+.hide{
+    display: none;
+}
+.cell{
+     background-color: aliceblue;
+     padding: 25px;
     border: 10px;
     width: 40px;
     height: 40px;
     color: black;
     text-align: center;
 }
+
 .cell img{
     width: 25px;
-    height: auto;
+    height: 25px;
 }
 
 .floor {
     background-color: gray;
+}
+
+
+.marked {
+    background-color: lightpink;
+}
+.cell h1{
+    display: none;
+}
+button{
+    text-align: center;
+    display:inline-block;
 }

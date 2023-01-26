@@ -1,30 +1,34 @@
+
+
 'use strict'
-const FLOOR = 'FLOOR'
+
 const MINE = 'MINE'
 const MINE_IMG = '<img src="img/mine.jpg">'
-var gNegsCount = gNegsCount
 var gBoard
-var negsCount
+var elBoard
+var minesAroundCount
 //gameStart
 function onInit() {
-    gBoard = buildBoard()
-    addMines(2)
-    renderBoard(gBoard)
-
+    gBoard = buildBoard(8)
+    addMines(4)
+    elBoard = renderBoard(gBoard)
+//console.log(elboard)
     //console.table(gBoard)
-    console.log(gBoard)
 }
 
 // buildingBoard
 function buildBoard() {
-    // Put FLOOR everywhere
     const rowCount = 4
     const colCount = 4
     const board = []
     for (var i = 0; i < rowCount; i++) {
         board[i] = []
         for (var j = 0; j < colCount; j++) {
-            board[i][j] = { type: FLOOR, gameElement: null }
+            board[i][j] = { 
+                 gameElement: null,
+                 isShown: false,
+                  isMine: false, 
+                 isMarked: false }
         }
     }
 
@@ -37,84 +41,85 @@ function renderBoard(board) {
     for (var i = 0; i < board.length; i++) {
         strHTML += '<tr>'
         for (var j = 0; j < board[0].length; j++) {
-            var currCell = board[i][j]
-            var cellClass = getClassName({ i: i, j: j }) + ''
-            strHTML += `<td class="cell ${cellClass}" onclick="onClick(${i},${j})"<span>${''}</span>`
-            if (currCell.gameElement === MINE) strHTML += MINE_IMG;
+            var elCell = board[i][j]
+            minesAroundCount = countNegs(i,j,gBoard)
+            var tdId = `cell-${i}-${j}`
+            strHTML += `<td id="${tdId}" class="cell" onclick="onCellClick(${i},${j})">`
+            if (elCell.isMarked) strHTML += '<span>M</span>';
+            if (elCell.gameElement === MINE) strHTML += `<img src="img/mine.jpg" class="hide">`;
+            strHTML += `<span class="hide">${minesAroundCount}</span>`
         }
         strHTML += '</td>'
-
         strHTML += '</tr>'
-
-        // console.log('strHTML', strHTML)
     }
     const elBoard = document.querySelector('.board')
     elBoard.innerHTML = strHTML
     return elBoard
 }
 
-// classBylocation
-function getClassName(location) {
-    const cellClass = 'cell-' + location.i + '-' + location.j
-    return cellClass
-}
-// onclickCell
-
-function onClick(i, j) {
+//clicking on cell
+function onCellClick(i, j) {
+    markCell(i, j);
     var negsCount = countNegs(i,j,gBoard);
-    if (gBoard[i][j].gameElement === MINE) {
-        gameOver();
-    } else {
-        gBoard[i][j].innerHTML = negsCount;
+    console.log(gBoard[i][j])
+    if (gBoard[i][j].gameElement === MINE && gBoard[i][j].gameElement !== null) {
+        var cellId = `cell-${i}-${j}`;
+        var elImg = document.getElementById(cellId).querySelector('img');
+        elImg.classList.remove('hide');
+        checkGameOver();
     }
-    console.log(negsCount)
-    return negsCount
+    
+    if(minesAroundCount >= 0) {
+        var cellId = `cell-${i}-${j}`;
+        var elCell = document.getElementById(cellId);
+        elCell.querySelector('span').classList.remove('hide');
+    }
+    return negsCount;
 }
-
 // addingMine
 function addMine() {
     var emptyPos = getEmptyPos();
     gBoard[emptyPos.i][emptyPos.j].gameElement = MINE;
 }
-
+// addingMines
 function addMines(num) {
     for (var i = 0; i < num; i++) {
         addMine();
     }
 }
-
+//randmoizing num- to mines. also runs on gboard so its not in util.
 function getEmptyPos() {
     const emptyPoss = []
     for (var i = 0; i < gBoard.length; i++) {
         for (var j = 0; j < gBoard[0].length; j++) {
-            if (gBoard[i][j].type === FLOOR && !gBoard[i][j].gameElement) {
-                emptyPoss.push({ i, j })
-            }
+            if (!gBoard[i][j].gameElement) emptyPoss.push({ i, j })
         }
     }
     var randIdx = getRandomInt(0, emptyPoss.length)
     return emptyPoss[randIdx]
 }
+//counts neighbours around mines.
 function countNegs(cellI, cellJ, board) {
-     negsCount = 0
+    var minesAroundCount = 0
     for (var i = cellI - 1; i <= cellI + 1; i++) {
         if (i < 0 || i >= board.length) continue
         for (var j = cellJ - 1; j <= cellJ + 1; j++) {
             if (j < 0 || j >= board[i].length) continue
             if (i === cellI && j === cellJ) continue  
             var currCell = board[i][j]   
-            if (currCell.gameElement === MINE) negsCount++;
+            if (currCell.gameElement === MINE) minesAroundCount++;
         }
  }
- return negsCount
+ return minesAroundCount
 }
-function gameOver() {
+//alerting game over
+function checkGameOver() {
     alert('YouLose')
 }
+//marking cell. still in work
+function markCell(i, j) {
+    gBoard[i][j].isMarked = !gBoard[i][j].isMarked;
+}
 
-// if (currCell.gameElement === MINE) gNegsCount++;
-// console.log(gNegsCount)
-// return gNegsCount
 
-
-
+//footer = Ican'tCodeForTheLifeOfMe.AdirDavid 26/1/2023
