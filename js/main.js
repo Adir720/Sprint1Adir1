@@ -1,9 +1,10 @@
 
 
 'use strict'
-
+const FLAG = 'FLAG'
 const MINE = 'MINE'
 const MINE_IMG = '<img src="img/mine.jpg">'
+const FLAG_IMG = '<img src="img/flag.png">'
 var gBoard
 var elBoard
 var minesAroundCount
@@ -12,10 +13,9 @@ function onInit() {
     gBoard = buildBoard(8)
     addMines(4)
     elBoard = renderBoard(gBoard)
-//console.log(elboard)
+    //console.log(elboard)
     //console.table(gBoard)
 }
-
 // buildingBoard
 function buildBoard() {
     const rowCount = 4
@@ -24,11 +24,12 @@ function buildBoard() {
     for (var i = 0; i < rowCount; i++) {
         board[i] = []
         for (var j = 0; j < colCount; j++) {
-            board[i][j] = { 
-                 gameElement: null,
-                 isShown: false,
-                  isMine: false, 
-                 isMarked: false }
+            board[i][j] = {
+                gameElement: null,
+                isShown: false,
+                isMine: false,
+                isMarked: false
+            }
         }
     }
 
@@ -42,11 +43,11 @@ function renderBoard(board) {
         strHTML += '<tr>'
         for (var j = 0; j < board[0].length; j++) {
             var elCell = board[i][j]
-            minesAroundCount = countNegs(i,j,gBoard)
+            minesAroundCount = countNegs(i, j, gBoard)
             var tdId = `cell-${i}-${j}`
-            strHTML += `<td id="${tdId}" class="cell" onclick="onCellClick(${i},${j})">`
-            if (elCell.isMarked) strHTML += '<span>M</span>';
+            strHTML += `<td id="${tdId}" class="cell" onclick="onCellClick(${i},${j})" oncontextmenu="markCell(${i},${j}); return false;">`
             if (elCell.gameElement === MINE) strHTML += `<img src="img/mine.jpg" class="hide">`;
+            if (elCell.isMarked) strHTML += '<img src="img/flag.png" class="flag">';
             strHTML += `<span class="hide">${minesAroundCount}</span>`
         }
         strHTML += '</td>'
@@ -59,8 +60,9 @@ function renderBoard(board) {
 
 //clicking on cell
 function onCellClick(i, j) {
+    if (gBoard[i][j].isMarked) return;
     markCell(i, j);
-    var negsCount = countNegs(i,j,gBoard);
+    var negsCount = countNegs(i, j, gBoard);
     console.log(gBoard[i][j])
     if (gBoard[i][j].gameElement === MINE && gBoard[i][j].gameElement !== null) {
         var cellId = `cell-${i}-${j}`;
@@ -68,12 +70,16 @@ function onCellClick(i, j) {
         elImg.classList.remove('hide');
         checkGameOver();
     }
-    
-    if(minesAroundCount >= 0) {
+
+    if (minesAroundCount >= 0) {
         var cellId = `cell-${i}-${j}`;
         var elCell = document.getElementById(cellId);
         elCell.querySelector('span').classList.remove('hide');
     }
+    elCell.addEventListener("contextmenu", function (event) {
+        event.preventDefault();
+        cell.classList.add("flag");
+    });
     return negsCount;
 }
 // addingMine
@@ -105,12 +111,12 @@ function countNegs(cellI, cellJ, board) {
         if (i < 0 || i >= board.length) continue
         for (var j = cellJ - 1; j <= cellJ + 1; j++) {
             if (j < 0 || j >= board[i].length) continue
-            if (i === cellI && j === cellJ) continue  
-            var currCell = board[i][j]   
+            if (i === cellI && j === cellJ) continue
+            var currCell = board[i][j]
             if (currCell.gameElement === MINE) minesAroundCount++;
         }
- }
- return minesAroundCount
+    }
+    return minesAroundCount
 }
 //alerting game over
 function checkGameOver() {
@@ -119,6 +125,7 @@ function checkGameOver() {
 //marking cell. still in work
 function markCell(i, j) {
     gBoard[i][j].isMarked = !gBoard[i][j].isMarked;
+    renderBoard(gBoard);
 }
 
 
