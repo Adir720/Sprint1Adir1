@@ -1,5 +1,4 @@
 
-
 'use strict'
 const FLAG = 'FLAG'
 const MINE = 'MINE'
@@ -8,11 +7,15 @@ const FLAG_IMG = '<img src="img/flag.png">'
 var gBoard
 var elBoard
 var minesAroundCount
+var timerInterval;
+var secondsPassed = 0;
+
 //gameStart
 function onInit() {
     gBoard = buildBoard(8)
     addMines(4)
     elBoard = renderBoard(gBoard)
+ 
     //console.log(elboard)
     //console.table(gBoard)
 }
@@ -26,8 +29,6 @@ function buildBoard() {
         for (var j = 0; j < colCount; j++) {
             board[i][j] = {
                 gameElement: null,
-                isMine: false,
-                isMarked: false
             }
         }
     }
@@ -73,10 +74,16 @@ function onCellClick(i, j) {
         var elCell = document.getElementById(cellId);
         elCell.querySelector('span').classList.remove('hide');
     }
-  
+    timerInterval = setInterval(() => {
+        secondsPassed++;
+        document.getElementById("timer").innerHTML = secondsPassed;
+    }, 1000);
+    checkWin()
     return negsCount;
+
 }
-function rightCLickCell(i,j){
+//function to right click cell(found with google.(contextmenu))
+function rightCLickCell(i, j) {
     var cellId = `cell-${i}-${j}`;
     var elCell = document.getElementById(cellId);
     elCell.addEventListener("contextmenu", function (event) {
@@ -106,7 +113,7 @@ function getEmptyPos() {
     var randIdx = getRandomInt(0, emptyPoss.length)
     return emptyPoss[randIdx]
 }
-//counts neighbours around mines.
+//counts neighbours around mines.(based on negs from class.)
 function countNegs(cellI, cellJ, board) {
     var minesAroundCount = 0
     for (var i = cellI - 1; i <= cellI + 1; i++) {
@@ -122,12 +129,23 @@ function countNegs(cellI, cellJ, board) {
 }
 //alerting game over
 function checkGameOver() {
+    clearInterval(timerInterval);
     alert('YouLose')
 }
 //marking cell.
 function markCell(i, j) {
     gBoard[i][j].isMarked = !gBoard[i][j].isMarked;
     renderBoard(gBoard);
+}
+//checking if player won
+function checkWin() {
+    for (var i = 0; i < gBoard.length; i++) {
+        for (var j = 0; j < gBoard[0].length; j++) {
+            if (gBoard[i][j].gameElement === MINE && !gBoard[i][j].isMarked) return;
+        }
+    }
+    clearInterval(timerInterval);
+    alert('You have won the game in ' + secondsPassed + ' seconds!');
 }
 
 
