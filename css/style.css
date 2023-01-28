@@ -39,10 +39,12 @@ table {
 .floor {
     background-color: gray;
 }
+
 .flag {
     background-color: lightpink;
     display: block;
 }
+
 .cell h1{
     display: none;
 }

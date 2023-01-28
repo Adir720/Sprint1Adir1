@@ -26,7 +26,6 @@ function buildBoard() {
         for (var j = 0; j < colCount; j++) {
             board[i][j] = {
                 gameElement: null,
-                isShown: false,
                 isMine: false,
                 isMarked: false
             }
@@ -47,7 +46,7 @@ function renderBoard(board) {
             var tdId = `cell-${i}-${j}`
             strHTML += `<td id="${tdId}" class="cell" onclick="onCellClick(${i},${j})" oncontextmenu="markCell(${i},${j}); return false;">`
             if (elCell.gameElement === MINE) strHTML += `<img src="img/mine.jpg" class="hide">`;
-            if (elCell.isMarked) strHTML += '<img src="img/flag.png" class="flag">';
+            if (elCell.isMarked) strHTML += '<img src="img/flag.png" class="flag" class="hide">';
             strHTML += `<span class="hide">${minesAroundCount}</span>`
         }
         strHTML += '</td>'
@@ -61,7 +60,6 @@ function renderBoard(board) {
 //clicking on cell
 function onCellClick(i, j) {
     if (gBoard[i][j].isMarked) return;
-    markCell(i, j);
     var negsCount = countNegs(i, j, gBoard);
     console.log(gBoard[i][j])
     if (gBoard[i][j].gameElement === MINE && gBoard[i][j].gameElement !== null) {
@@ -70,17 +68,21 @@ function onCellClick(i, j) {
         elImg.classList.remove('hide');
         checkGameOver();
     }
-
     if (minesAroundCount >= 0) {
         var cellId = `cell-${i}-${j}`;
         var elCell = document.getElementById(cellId);
         elCell.querySelector('span').classList.remove('hide');
     }
+  
+    return negsCount;
+}
+function rightCLickCell(i,j){
+    var cellId = `cell-${i}-${j}`;
+    var elCell = document.getElementById(cellId);
     elCell.addEventListener("contextmenu", function (event) {
         event.preventDefault();
         cell.classList.add("flag");
     });
-    return negsCount;
 }
 // addingMine
 function addMine() {
@@ -122,7 +124,7 @@ function countNegs(cellI, cellJ, board) {
 function checkGameOver() {
     alert('YouLose')
 }
-//marking cell. still in work
+//marking cell.
 function markCell(i, j) {
     gBoard[i][j].isMarked = !gBoard[i][j].isMarked;
     renderBoard(gBoard);
